@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 
 class TwistController extends Controller
 {
+
+    public function __construct(){
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -48,7 +53,8 @@ class TwistController extends Controller
      */
     public function show(Twist $twist)
     {
-        return view('show',compact('twist'));
+        $replies = $twist->replies;
+        return view('show',compact('twist','replies'));
     }
 
     /**

@@ -9,7 +9,7 @@
             @foreach($twists as $twist)
                 <div class="panel panel-default">
                     <div class="panel-heading">Twist</div>
-                    <a href="/twist/{{ $twist->id }}"><div class="panel-body">{{ $twist->body }}</div></a>
+                    <a href="{{ $twist->path() }}"><div class="panel-body">{{ $twist->body }}</div></a>
                 </div>
             @endforeach
             </div>   
