@@ -14,7 +14,9 @@ class TwistController extends Controller
      */
     public function index()
     {
-        return Twist::all();
+        $twists = Twist::all();
+
+        return view('index',compact('twists'));
     }
 
     /**
@@ -46,7 +48,7 @@ class TwistController extends Controller
      */
     public function show(Twist $twist)
     {
-        return $twist;
+        return view('show',compact('twist'));
     }
 
     /**
