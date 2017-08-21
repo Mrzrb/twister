@@ -31,4 +31,8 @@ class User extends Authenticatable
     public function twist(){
         return $this->hasMany(\App\Twist::class);
     }
+
+    public function groups(){
+        return $this->belongsToMany(\App\Group::class);
+    }
 }

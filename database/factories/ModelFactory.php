@@ -52,3 +52,11 @@ $factory->define(App\Reply::class,function(Faker\Generator $faker){
         'to_who' => 1,
     ];
 });
+
+
+$factory->define(App\Group::class,function(Faker\Generator $faker){
+    return [
+        'name' => $faker->word,
+        'member_num' => mt_rand(10,100)
+    ];
+});
