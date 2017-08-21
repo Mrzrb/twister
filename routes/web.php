@@ -26,3 +26,6 @@ Route::get('/home', 'HomeController@index');
 
 Route::get('/twist','TwistController@index')->name('home');
 Route::get('/twist/{twist}','TwistController@show');
+
+Route::any('/github','OAuthController@redirectToProvider');
+Route::any('/github/callback','OAuthController@handleProviderCallback');
