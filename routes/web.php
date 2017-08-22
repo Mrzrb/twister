@@ -41,3 +41,12 @@ Route::any('/github/callback','OAuthController@handleProviderCallback');
 
 //User Follow
 Route::get('/follow/{user}','UserController@followOrNot');
+
+
+
+
+//group
+
+Route::get('/group','GroupController@index');
+Route::get('/group/create','GroupController@create');
+Route::post('/group','GroupController@store');

@@ -5,14 +5,14 @@
         <div class="col-md-row col-md-offset-2">
 
         
-        <form action="/twist" method="POST" role="form">
+        <form action="/group" method="POST" role="form">
             {{ csrf_field() }}
             <div class="form-group">
                 
-                <input type="text" class="form-control" id="" name="body" placeholder="Twist an Twister">
+                <input type="text" class="form-control" id="" name="name" placeholder="enter the name of group">
             </div>
 
-            <button type="submit" class="btn btn-primary">Twist it</button>
+            <button type="submit" class="btn btn-primary">Establish the group</button>
         </form>
         
             

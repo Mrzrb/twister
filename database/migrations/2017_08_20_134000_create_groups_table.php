@@ -16,7 +16,7 @@ class CreateGroupsTable extends Migration
         Schema::create('groups', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->integer('member_num');
+            $table->integer('member_num')->default(0);
             $table->timestamps();
         });
 
@@ -34,5 +34,6 @@ class CreateGroupsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('groups');
+        Schema::dropIfExists('group_user');
     }
 }

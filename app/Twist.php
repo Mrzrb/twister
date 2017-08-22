@@ -11,7 +11,7 @@ class Twist extends Model
 
 	protected $guarded = [] ;
     public function path(){
-        return '/twist/' . $this->id;
+        return '/twist/'  . $this->id;
     }
 
 

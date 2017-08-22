@@ -2,7 +2,6 @@
 
 @section('content')
 
-   <div class="container">
        <div class="row">
            <div class="col-md-row col-md-offset-2">
 
@@ -14,6 +13,5 @@
             @endforeach
             </div>   
        </div>
-   </div>
 
 @endsection
