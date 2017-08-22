@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\Twist;
+use App\Reply;
 use Illuminate\Http\Request;
 
 class TwistController extends Controller
@@ -19,7 +21,7 @@ class TwistController extends Controller
      */
     public function index()
     {
-        $twists = Twist::all();
+        $twists = Twist::latest()->get();
 
         return view('index',compact('twists'));
     }
@@ -31,7 +33,7 @@ class TwistController extends Controller
      */
     public function create()
     {
-        //
+        return view('twist.create');
     }
 
     /**
@@ -42,7 +44,14 @@ class TwistController extends Controller
      */
     public function store(Request $request)
     {
-        //
+		Twist::create(
+			[
+				'user_id' => Auth::user()->id,
+				'body' => $request->body,
+				'position' => 'test'
+			]
+		); 
+		return redirect('/twist');
     }
 
     /**
@@ -89,5 +98,12 @@ class TwistController extends Controller
     public function destroy(Twist $twist)
     {
         //
+    }
+
+
+    public function reply(Twist $twist , Request $request)
+    {
+        $twist->reply($request);
+        return back();
     }
 }

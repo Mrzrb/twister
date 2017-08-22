@@ -25,7 +25,14 @@ Auth::routes();
 Route::get('/home', 'HomeController@index');
 
 Route::get('/twist','TwistController@index')->name('home');
+Route::get('/twist/create','TwistController@create');
+Route::post('/twist','TwistController@store');
 Route::get('/twist/{twist}','TwistController@show');
+
+//reply
+Route::post('/twist/{twist}/reply','TwistController@reply');
+
+
 
 //github sociate
 Route::any('/github','OAuthController@redirectToProvider');

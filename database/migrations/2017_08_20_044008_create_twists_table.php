@@ -18,10 +18,10 @@ class CreateTwistsTable extends Migration
             $table->integer('user_id');
             $table->text('body');
             $table->string('position');
-            $table->integer('reply_num');
-            $table->integer('like_num');
-            $table->tinyinteger('is_retwist');
-            $table->integer('retwist_id');
+            $table->integer('reply_num')->default(0);
+            $table->integer('like_num')->default(0);
+            $table->tinyinteger('is_retwist')->default(0);
+            $table->integer('retwist_id')->default(0);
             $table->timestamps();
         });
     }

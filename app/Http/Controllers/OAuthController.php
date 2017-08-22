@@ -37,7 +37,7 @@ class OAuthController extends Controller
         ]);
 
         (new RegisterController)->register($req,$u);
-       redirect('/');
+       
        
 
         
