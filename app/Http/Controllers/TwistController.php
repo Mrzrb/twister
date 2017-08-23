@@ -21,7 +21,7 @@ class TwistController extends Controller
      */
     public function index()
     {
-        $twists = Twist::latest()->get();
+        $twists = Twist::latest()->paginate(20);
 
         return view('index',compact('twists'));
     }
@@ -62,7 +62,7 @@ class TwistController extends Controller
      */
     public function show(Twist $twist)
     {
-        $replies = $twist->replies;
+        $replies = $twist->replies()->latest()->paginate(10);
         return view('show',compact('twist','replies'));
     }
 
@@ -105,5 +105,10 @@ class TwistController extends Controller
     {
         $twist->reply($request);
         return back();
+    }
+
+
+    public function scopeFilter($query, $filter){
+        return $filter->apply($query);
     }
 }

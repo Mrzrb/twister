@@ -13,7 +13,7 @@
 
 
        <div class="row">
-           <div class="col-md-row">
+           <div class="col-md-row reply">
                 @foreach($replies as $reply)
                     @include('twist.reply')
                 @endforeach
@@ -32,6 +32,7 @@
         <button type="submit" class="btn btn-primary">Reply</button>
     </form>
     
+    {{ $replies->links() }}
 
 
 @endsection

@@ -3,7 +3,7 @@
 @section('content')
 
        <div class="row">
-           <div class="col-md-row col-md-offset-2">
+           <div class="col-md-row">
 
             @foreach($twists as $twist)
                 <div class="panel panel-default">
@@ -16,7 +16,9 @@
                     
                 </div>
             @endforeach
+            {{ $twists->links() }}
             </div>   
+            
        </div>
 
 @endsection

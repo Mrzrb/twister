@@ -31,7 +31,7 @@ $factory->define(App\Twist::class,function(Faker\Generator $faker){
         'user_id' => function(){
             return factory('App\User')->create()->id;
         },
-        'body' => $faker->sentence,
+        'body' => $faker->paragraph,
         'position' => $faker->sentence,
         'reply_num' => $faker ->numberBetween(0,200),
         'like_num' => $faker ->numberBetween(0,200),
@@ -42,7 +42,7 @@ $factory->define(App\Twist::class,function(Faker\Generator $faker){
 
 $factory->define(App\Reply::class,function(Faker\Generator $faker){
     return [
-        'body' => $faker->sentence,
+        'body' => $faker->paragraph,
         'user_id' => function(){
             return factory('App\User')->create()->id;
         },
