@@ -2,7 +2,7 @@
  @foreach($groups as $group)
     <li class="list-group-item">
         <span class="badge"></span> 
-        <a> {{ $group->name }} </a>
+        <a href="{{ $group->path() }}"> {{ $group->name }} </a>
     </li>
 @endforeach
 </ul>

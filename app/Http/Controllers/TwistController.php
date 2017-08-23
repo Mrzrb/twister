@@ -6,6 +6,7 @@ use Auth;
 use App\Twist;
 use App\Reply;
 use Illuminate\Http\Request;
+use App\Filters\TwistFilter;
 
 class TwistController extends Controller
 {
@@ -19,9 +20,9 @@ class TwistController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index( TwistFilter $filter)
     {
-        $twists = Twist::latest()->paginate(20);
+        $twists = Twist::latest()->filter($filter)->paginate(20);
 
         return view('index',compact('twists'));
     }
@@ -108,7 +109,5 @@ class TwistController extends Controller
     }
 
 
-    public function scopeFilter($query, $filter){
-        return $filter->apply($query);
-    }
+
 }

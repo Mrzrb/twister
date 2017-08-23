@@ -19,10 +19,9 @@ class Filter{
     public function apply($builder)
     {
        $this->builder = $builder; 
-
         $this->getFilter()
         ->filter(function($filter){
-            return method_exist($this,$filter);
+            return method_exists($this,$filter);
         })->each(function($filter,$value){
             $this->$filter($value);
         });

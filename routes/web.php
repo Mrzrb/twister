@@ -50,3 +50,5 @@ Route::get('/follow/{user}','UserController@followOrNot');
 Route::get('/group','GroupController@index');
 Route::get('/group/create','GroupController@create');
 Route::post('/group','GroupController@store');
+
+Route::get('/group/{group}','GroupController@show');

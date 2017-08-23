@@ -31,4 +31,8 @@ class Twist extends Model
     public function reply( Request $request){
         \App\Reply::create($request->all());
     }
+
+    public function scopeFilter($query, $filter){
+        return $filter->apply($query);
+    }
 }
