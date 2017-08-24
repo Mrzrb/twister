@@ -22,7 +22,7 @@ class TwistController extends Controller
      */
     public function index( TwistFilter $filter)
     {
-        $twists = Twist::latest()->filter($filter)->paginate(20);
+        $twists = Twist::latest()->with('user')->filter($filter)->paginate(20);
 
         return view('index',compact('twists'));
     }

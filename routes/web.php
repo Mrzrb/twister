@@ -41,9 +41,9 @@ Route::any('/github/callback','OAuthController@handleProviderCallback');
 
 //User Follow
 Route::get('/follow/{user}','UserController@followOrNot');
-
 Route::get('user/{group}/join','UserController@joinOrNot');
-
+//User Profile
+Route::get('/user/{profileUser}','ProfileController@show');
 
 
 

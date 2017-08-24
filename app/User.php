@@ -51,9 +51,9 @@ class User extends Authenticatable
 
 
 
-    public function path($action)
+    public function path()
     {
-        return '/user/' . $this->id . '/' . $action;
+        return '/user/' . $this->id; 
     }
 }
 
