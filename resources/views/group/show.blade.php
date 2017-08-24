@@ -11,18 +11,39 @@
                         <a href="/user/{{ $group->id }}/join"><button type="button" class="btn btn-default">Join</button></a>
                         
                      </div>
+
                     <div class="panel-body">
+                     @if(count($group->users))
                         <h3>User</h3>
                         <ul class="list-group">
                             @foreach($group->users as $user)
                             <li class="list-group-item">{{ $user->name }}</li>
                             @endforeach
                         </ul>
-                        
+                     @else
+                        <h3>No User, are you nterested in this group?</h3>
+                     @endif   
                     </div>
                 </div>
-            </div>   
-       </div>
+
+                @if(count($group->users))
+                <div class="panel panel-default">
+                    <div class="panel-heading">Twist in this Group :  
+                        <strong>{{ $group->name }}</strong>
+                     </div>
+                    <div class="panel-body">
+                        <h3></h3>
+                        <ul class="list-group">
+                            @foreach($group->users as $user)
+                                @foreach($user->twist as $twist)
+                                    @include('twist.show')
+                                @endforeach
+                            @endforeach
+                        </ul>
+                        
+                    </div>   
+                 </div>
+                 @endif
 
 
        
