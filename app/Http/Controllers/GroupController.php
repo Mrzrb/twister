@@ -14,8 +14,8 @@ class GroupController extends Controller
      */
     public function index()
     {
-        $groups = Group::all();
-        return view('group.group',compact('groups'));
+        // $groups = Group::all();
+        // return view('group.group',compact('groups'));
     }
 
     /**

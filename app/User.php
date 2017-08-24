@@ -47,6 +47,14 @@ class User extends Authenticatable
         return $this->belongsToMany(\App\User::class,'follow','followee_id','follower_id');
     }
 
+
+
+
+
+    public function path($action)
+    {
+        return '/user/' . $this->id . '/' . $action;
+    }
 }
 
 

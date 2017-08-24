@@ -42,12 +42,14 @@ Route::any('/github/callback','OAuthController@handleProviderCallback');
 //User Follow
 Route::get('/follow/{user}','UserController@followOrNot');
 
+Route::get('user/{group}/join','UserController@joinOrNot');
+
 
 
 
 //group
 
-Route::get('/group','GroupController@index');
+// Route::get('/group','GroupController@index');
 Route::get('/group/create','GroupController@create');
 Route::post('/group','GroupController@store');
 

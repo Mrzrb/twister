@@ -885,3 +885,20 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+
+//custom
+if (! function_exists('inPool')) {
+    function inPool( $pool, $item, $index='id' )
+    {
+        foreach($pool as $t){
+            if($t->id == $item->id)
+                return true;
+        }
+        return false;
+    }
+}
+
+
+
+

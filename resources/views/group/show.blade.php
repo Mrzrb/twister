@@ -8,13 +8,15 @@
                     <div class="panel-heading">Group :  
                         <strong>{{ $group->name }}</strong>
                         
-                        <a href=""><button type="button" class="btn btn-default">Join</button></a>
+                        <a href="/user/{{ $group->id }}/join"><button type="button" class="btn btn-default">Join</button></a>
                         
                      </div>
                     <div class="panel-body">
                         <h3>User</h3>
                         <ul class="list-group">
-                            <li class="list-group-item">Item 1</li>
+                            @foreach($group->users as $user)
+                            <li class="list-group-item">{{ $user->name }}</li>
+                            @endforeach
                         </ul>
                         
                     </div>
