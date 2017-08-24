@@ -6,11 +6,13 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Activity' => $baseDir . '/app/Activity.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Exceptions\\Handler' => $baseDir . '/app/Exceptions/Handler.php',
     'App\\Filters\\Filter' => $baseDir . '/app/Filters/Filter.php',
     'App\\Filters\\TwistFilter' => $baseDir . '/app/Filters/TwistFilter.php',
     'App\\Group' => $baseDir . '/app/Group.php',
+    'App\\Http\\Controllers\\Activity' => $baseDir . '/app/Http/Controllers/Activity.php',
     'App\\Http\\Controllers\\Auth\\ForgotPasswordController' => $baseDir . '/app/Http/Controllers/Auth/ForgotPasswordController.php',
     'App\\Http\\Controllers\\Auth\\LoginController' => $baseDir . '/app/Http/Controllers/Auth/LoginController.php',
     'App\\Http\\Controllers\\Auth\\RegisterController' => $baseDir . '/app/Http/Controllers/Auth/RegisterController.php',
@@ -19,6 +21,7 @@ return array(
     'App\\Http\\Controllers\\GroupController' => $baseDir . '/app/Http/Controllers/GroupController.php',
     'App\\Http\\Controllers\\HomeController' => $baseDir . '/app/Http/Controllers/HomeController.php',
     'App\\Http\\Controllers\\OAuthController' => $baseDir . '/app/Http/Controllers/OAuthController.php',
+    'App\\Http\\Controllers\\ProfileController' => $baseDir . '/app/Http/Controllers/ProfileController.php',
     'App\\Http\\Controllers\\ReplyController' => $baseDir . '/app/Http/Controllers/ReplyController.php',
     'App\\Http\\Controllers\\TwistController' => $baseDir . '/app/Http/Controllers/TwistController.php',
     'App\\Http\\Controllers\\UserController' => $baseDir . '/app/Http/Controllers/UserController.php',

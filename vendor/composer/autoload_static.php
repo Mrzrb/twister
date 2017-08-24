@@ -391,11 +391,13 @@ class ComposerStaticInit234d0b834308cfc5c3e889164af838c2
     );
 
     public static $classMap = array (
+        'App\\Activity' => __DIR__ . '/../..' . '/app/Activity.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Filters\\Filter' => __DIR__ . '/../..' . '/app/Filters/Filter.php',
         'App\\Filters\\TwistFilter' => __DIR__ . '/../..' . '/app/Filters/TwistFilter.php',
         'App\\Group' => __DIR__ . '/../..' . '/app/Group.php',
+        'App\\Http\\Controllers\\Activity' => __DIR__ . '/../..' . '/app/Http/Controllers/Activity.php',
         'App\\Http\\Controllers\\Auth\\ForgotPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ForgotPasswordController.php',
         'App\\Http\\Controllers\\Auth\\LoginController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/LoginController.php',
         'App\\Http\\Controllers\\Auth\\RegisterController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/RegisterController.php',
@@ -404,6 +406,7 @@ class ComposerStaticInit234d0b834308cfc5c3e889164af838c2
         'App\\Http\\Controllers\\GroupController' => __DIR__ . '/../..' . '/app/Http/Controllers/GroupController.php',
         'App\\Http\\Controllers\\HomeController' => __DIR__ . '/../..' . '/app/Http/Controllers/HomeController.php',
         'App\\Http\\Controllers\\OAuthController' => __DIR__ . '/../..' . '/app/Http/Controllers/OAuthController.php',
+        'App\\Http\\Controllers\\ProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProfileController.php',
         'App\\Http\\Controllers\\ReplyController' => __DIR__ . '/../..' . '/app/Http/Controllers/ReplyController.php',
         'App\\Http\\Controllers\\TwistController' => __DIR__ . '/../..' . '/app/Http/Controllers/TwistController.php',
         'App\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',

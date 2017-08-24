@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Activity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
@@ -9,7 +10,27 @@ use Illuminate\Http\Request;
 class Twist extends Model
 {
 
-	protected $guarded = [] ;
+    protected $guarded = [] ;
+    
+
+    protected static function boot(){
+        parent::boot();
+
+        static::created(function($twist){
+            $twist->recordActivity('create');
+        });
+    }
+
+
+    public function recordActivity($event){
+        Activity::create([
+            'user_id' => \Auth::user()->id,
+            'type' => $event .'_'. strtolower((new \ReflectionClass($this))->getShortName()),
+            'subject_id' => $this->id,
+            'subject_type' => Twist::class
+        ]);
+    }
+    
     public function path(){
         return '/twist/'  . $this->id;
     }

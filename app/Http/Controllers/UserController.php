@@ -17,6 +17,7 @@ class UserController extends Controller
     public function followOrNot(User $user)
     {
         Auth::user()->follow()->toggle($user->id);
+        return back();
     }
 
     public function joinOrNot(Group $group)
