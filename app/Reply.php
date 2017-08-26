@@ -19,12 +19,9 @@ class Reply extends Model
         return $this->belongsTo(\App\User::class,'to_who');
     }
 
-
-    protected static function boot()
+    public function twist()
     {
-        parent::boot();
-        static::created(function($reply){
-            $reply->recordActivity('create');
-        });
+        return $this->belongsTo(\App\Twist::class);
     }
+
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -13,6 +14,7 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
+
 <body>
     <div id="app">
         <nav class="navbar navbar-default navbar-static-top">
@@ -39,60 +41,64 @@
                         &nbsp;
                     </ul>
 
+                    <ul class="nav navbar-nav">
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                            <li><a href="#">Regular link</a></li>
+                            <li class="disabled"><a href="#">Disabled link</a></li>
+                            <li><a href="#">Another link</a></li>
+                        </ul>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        @include('group.group')
+                    </ul>
+
+                    
+
                     <!-- Right Side Of Navbar -->
                     <ul class="nav navbar-nav navbar-right">
                         <!-- Authentication Links -->
                         @if (Auth::guest())
-                            <li><a href="{{ route('login') }}">Login</a></li>
-                            <li><a href="{{ route('register') }}">Register</a></li>
+                        <li><a href="{{ route('login') }}">Login</a></li>
+                        <li><a href="{{ route('register') }}">Register</a></li>
                         @else
-							<li> <a href="/twist/create"> <button class="btn btn-primary">Twist</button> </a> </li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                        <li> <a href="/twist/create"> <button class="btn btn-primary">Twist</button> </a> </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                     {{ Auth::user()->name }} <span class="caret"></span>
                                 </a>
 
-                                <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                        <a href="{{ route('logout') }}"
-                                            onclick="event.preventDefault();
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="{{ route('logout') }}" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                             Logout
                                         </a>
 
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                            {{ csrf_field() }}
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                        {{ csrf_field() }}
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
                         @endif
                     </ul>
                 </div>
             </div>
         </nav>
 
-        
-        <div class="container">
-            
-            
-            
-            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
-                @include('slide.left')
-            </div>
-            
 
-            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+        <div class="container">
                 @yield('content')
-            </div>
         </div>
-        
+
         <flash message="{{ session('flash') }}"></flash>
 
-        
+
     </div>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
 </body>
+
 </html>

@@ -49,6 +49,11 @@ class User extends Authenticatable
     }
 
 
+    public function activity(){
+        return $this->hasMany(\App\Activity::class);
+    }
+
+
 
 
 

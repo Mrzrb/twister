@@ -12,29 +12,6 @@ class Twist extends Model
     use RecordActivity;
     protected $guarded = [] ;
     
-
-    protected static function boot(){
-        parent::boot();
-
-        static::created(function($twist){
-            $twist->recordActivity('create');
-        });
-    }
-
-
-    // public function recordActivity($event){
-    //     Activity::create([
-    //         'user_id' => \Auth::user()->id,
-    //         'type' => $this->getActivityType($event),
-    //         'subject_id' => $this->id,
-    //         'subject_type' => Twist::class
-    //     ]);
-    // }
-
-    // public function getActivityType($event)
-    // {
-    //     return $event .'_'. strtolower((new \ReflectionClass($this))->getShortName());
-    // }
     
     public function path(){
         return '/twist/'  . $this->id;

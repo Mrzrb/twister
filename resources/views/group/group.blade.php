@@ -1,8 +1,14 @@
-<ul class="list-group">
- @foreach($groups as $group)
-    <li class="list-group-item">
-        <span class="badge"></span> 
-        <a href="{{ $group->path() }}"> {{ $group->name }} </a>
-    </li>
-@endforeach
-</ul>
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+        <strong>Group</strong> <span class="caret"></span>
+    </a>
+
+    <ul class="dropdown-menu" role="menu">
+        <li>
+            @foreach($groups as $group)
+            <a href="{{ $group->path() }}">
+                {{ $group->name }}
+            </a> @endforeach
+        </li>
+    </ul>
+</li>
