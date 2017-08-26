@@ -39,7 +39,7 @@ class GroupController extends Controller
         Group::create([
             'name' => $request->name,
         ]);
-        return redirect('/group');
+        return redirect('/twist')->with('flash','Your group has been published');
     }
 
     /**

@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class Twist extends Model
 {
-
+    use RecordActivity;
     protected $guarded = [] ;
     
 
@@ -22,14 +22,19 @@ class Twist extends Model
     }
 
 
-    public function recordActivity($event){
-        Activity::create([
-            'user_id' => \Auth::user()->id,
-            'type' => $event .'_'. strtolower((new \ReflectionClass($this))->getShortName()),
-            'subject_id' => $this->id,
-            'subject_type' => Twist::class
-        ]);
-    }
+    // public function recordActivity($event){
+    //     Activity::create([
+    //         'user_id' => \Auth::user()->id,
+    //         'type' => $this->getActivityType($event),
+    //         'subject_id' => $this->id,
+    //         'subject_type' => Twist::class
+    //     ]);
+    // }
+
+    // public function getActivityType($event)
+    // {
+    //     return $event .'_'. strtolower((new \ReflectionClass($this))->getShortName());
+    // }
     
     public function path(){
         return '/twist/'  . $this->id;
@@ -38,7 +43,7 @@ class Twist extends Model
 
     //relationship area
     public function replies(){
-        return $this->hasMany(\App\Reply::class);
+        return $this->hasMany(\App\Reply::class)->with('owner')->with('towho');
     }
 
     public function user(){

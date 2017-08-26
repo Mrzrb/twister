@@ -76,6 +76,7 @@
         <div class="container">
             
             
+            
             <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
                 @include('slide.left')
             </div>
@@ -84,9 +85,9 @@
             <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                 @yield('content')
             </div>
-            
         </div>
         
+        <flash message="{{ session('flash') }}"></flash>
 
         
     </div>

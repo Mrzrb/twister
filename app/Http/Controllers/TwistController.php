@@ -52,7 +52,8 @@ class TwistController extends Controller
 				'position' => 'test'
 			]
 		); 
-		return redirect('/twist');
+        return redirect('/twist')
+            ->with('flash','Twist success!');
     }
 
     /**
@@ -105,7 +106,7 @@ class TwistController extends Controller
     public function reply(Twist $twist , Request $request)
     {
         $twist->reply($request);
-        return back();
+        return back()->with('flash','Your apply has been left');
     }
 
 

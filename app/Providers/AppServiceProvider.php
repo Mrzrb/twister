@@ -14,7 +14,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         \View::composer('group.group',function($view){
-            $view->with('groups',\App\Group::all());
+            $groups = \Cache::rememberForever('groups',function(){
+                return \App\Group::all();
+            });
+
+            $view->with('groups',$groups);
         });
     }
 

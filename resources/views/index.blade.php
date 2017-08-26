@@ -4,7 +4,6 @@
 
        <div class="row">
            <div class="col-md-row">
-
             @foreach($twists as $twist)
                 <div class="panel panel-default">
                     <div class="panel-heading"> 
