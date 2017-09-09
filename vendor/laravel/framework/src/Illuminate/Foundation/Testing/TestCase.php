@@ -92,7 +92,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Boot the testing helper traits.
      *
-     * @return array
+     * @return void
      */
     protected function setUpTraits()
     {
@@ -113,8 +113,6 @@ abstract class TestCase extends BaseTestCase
         if (isset($uses[WithoutEvents::class])) {
             $this->disableEventsForAllTests();
         }
-
-        return $uses;
     }
 
     /**

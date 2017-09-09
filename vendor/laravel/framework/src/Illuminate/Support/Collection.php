@@ -10,6 +10,7 @@ use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
+use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -31,8 +32,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @var array
      */
     protected static $proxies = [
-        'average', 'avg', 'contains', 'each', 'every', 'filter', 'first', 'flatMap',
-        'map', 'partition', 'reject', 'sortBy', 'sortByDesc', 'sum',
+        'contains', 'each', 'every', 'filter', 'first', 'map',
+        'partition', 'reject', 'sortBy', 'sortByDesc', 'sum',
     ];
 
     /**
@@ -55,26 +56,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public static function make($items = [])
     {
         return new static($items);
-    }
-
-    /**
-     * Create a new collection by invoking the callback a given number of times.
-     *
-     * @param  int  $number
-     * @param  callable  $callback
-     * @return static
-     */
-    public static function times($number, callable $callback = null)
-    {
-        if ($number < 1) {
-            return new static;
-        }
-
-        if (is_null($callback)) {
-            return new static(range(1, $number));
-        }
-
-        return (new static(range(1, $number)))->map($callback);
     }
 
     /**
@@ -230,19 +211,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Cross join with the given lists, returning all possible permutations.
-     *
-     * @param  mixed  ...$lists
-     * @return static
-     */
-    public function crossJoin(...$lists)
-    {
-        return new static(Arr::crossJoin(
-            $this->items, ...array_map([$this, 'getArrayableItems'], $lists)
-        ));
-    }
-
-    /**
      * Get the items in the collection that are not present in the given items.
      *
      * @param  mixed  $items
@@ -251,17 +219,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function diff($items)
     {
         return new static(array_diff($this->items, $this->getArrayableItems($items)));
-    }
-
-    /**
-     * Get the items in the collection whose keys and values are not present in the given items.
-     *
-     * @param  mixed  $items
-     * @return static
-     */
-    public function diffAssoc($items)
-    {
-        return new static(array_diff_assoc($this->items, $this->getArrayableItems($items)));
     }
 
     /**
@@ -290,19 +247,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return $this;
-    }
-
-    /**
-     * Execute a callback over each nested chunk of items.
-     *
-     * @param  callable  $callback
-     * @return static
-     */
-    public function eachSpread(callable $callback)
-    {
-        return $this->each(function ($chunk) use ($callback) {
-            return $callback(...$chunk);
-        });
     }
 
     /**
@@ -381,19 +325,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return $this;
-    }
-
-    /**
-     * Apply the callback if the value is falsy.
-     *
-     * @param  bool  $value
-     * @param  callable  $callback
-     * @param  callable  $default
-     * @return mixed
-     */
-    public function unless($value, callable $callback, callable $default = null)
-    {
-        return $this->when(! $value, $callback, $default);
     }
 
     /**
@@ -599,8 +530,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             }
 
             foreach ($groupKeys as $groupKey) {
-                $groupKey = is_bool($groupKey) ? (int) $groupKey : $groupKey;
-
                 if (! array_key_exists($groupKey, $results)) {
                     $results[$groupKey] = new static;
                 }
@@ -675,17 +604,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function intersect($items)
     {
         return new static(array_intersect($this->items, $this->getArrayableItems($items)));
-    }
-
-    /**
-     * Intersect the collection with the given items by key.
-     *
-     * @param  mixed  $items
-     * @return static
-     */
-    public function intersectKey($items)
-    {
-        return new static(array_intersect_key($this->items, $this->getArrayableItems($items)));
     }
 
     /**
@@ -766,38 +684,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $items = array_map($callback, $this->items, $keys);
 
         return new static(array_combine($keys, $items));
-    }
-
-    /**
-     * Run a map over each nested chunk of items.
-     *
-     * @param  callable  $callback
-     * @return static
-     */
-    public function mapSpread(callable $callback)
-    {
-        return $this->map(function ($chunk) use ($callback) {
-            return $callback(...$chunk);
-        });
-    }
-
-    /**
-     * Run a grouping map over the items.
-     *
-     * The callback should return an associative array with a single key/value pair.
-     *
-     * @param  callable  $callback
-     * @return static
-     */
-    public function mapToGroups(callable $callback)
-    {
-        $groups = $this->map($callback)->reduce(function ($groups, $pair) {
-            $groups[key($pair)][] = reset($pair);
-
-            return $groups;
-        }, []);
-
-        return (new static($groups))->map([$this, 'make']);
     }
 
     /**
@@ -1026,23 +912,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Push all of the given items onto the collection.
-     *
-     * @param  \Traversable  $source
-     * @return self
-     */
-    public function concat($source)
-    {
-        $result = new static($this);
-
-        foreach ($source as $item) {
-            $result->push($item);
-        }
-
-        return $result;
-    }
-
-    /**
      * Get and remove an item from the collection.
      *
      * @param  mixed  $key
@@ -1069,20 +938,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Get one or a specified number of items randomly from the collection.
+     * Get one or more items randomly from the collection.
      *
-     * @param  int|null  $number
+     * @param  int|null  $amount
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public function random($number = null)
+    public function random($amount = 1)
     {
-        if (is_null($number)) {
-            return Arr::random($this->items);
+        if ($amount > ($count = $this->count())) {
+            throw new InvalidArgumentException("You requested {$amount} items, but there are only {$count} items in the collection.");
         }
 
-        return new static(Arr::random($this->items, $number));
+        $keys = array_rand($this->items, $amount);
+
+        if (count(func_get_args()) == 0) {
+            return $this->items[$keys];
+        }
+
+        $keys = array_wrap($keys);
+
+        return new static(array_intersect_key($this->items, array_flip($keys)));
     }
 
     /**

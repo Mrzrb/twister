@@ -20,43 +20,62 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'email' => $faker->unique()->safeEmail,
         'password' => $password ?: $password = bcrypt('secret'),
         'remember_token' => str_random(10),
+        'confirmed' => true
     ];
 });
 
-$factory->define(App\Twist::class,function(Faker\Generator $faker){
+
+$factory->state(App\User::class, 'unconfirmed', function () {
     return [
-        'id' => function(){
-             return factory('App\User')->create()->id;
-        },
-        'user_id' => function(){
+        'confirmed' => false
+    ];
+});
+
+
+$factory->define(App\Thread::class, function ($faker) {
+    return [
+        'user_id' => function () {
             return factory('App\User')->create()->id;
         },
-        'body' => $faker->paragraph,
-        'position' => $faker->sentence,
-        'reply_num' => $faker ->numberBetween(0,200),
-        'like_num' => $faker ->numberBetween(0,200),
-        'is_retwist' => 0, 
-        'retwist_id' => $faker ->numberBetween(0,200)
+        'channel_id' => function () {
+            return factory('App\Channel')->create()->id;
+        },
+        'title' => $faker->sentence,
+        'body'  => $faker->paragraph,
+        'visits' => 0
     ];
 });
 
-$factory->define(App\Reply::class,function(Faker\Generator $faker){
+$factory->define(App\Channel::class, function ($faker) {
+    $name = $faker->word;
+
     return [
-        'body' => $faker->paragraph,
-        'user_id' => function(){
+        'name' => $name,
+        'slug' => $name
+    ];
+});
+
+
+$factory->define(App\Reply::class, function ($faker) {
+    return [
+        'thread_id' => function () {
+            return factory('App\Thread')->create()->id;
+        },
+        'user_id' => function () {
             return factory('App\User')->create()->id;
         },
-        'twist_id' => function(){
-            return factory('App\Twist')->create()->id;
-        },
-        'to_who' => 1,
+        'body'  => $faker->paragraph
     ];
 });
 
-
-$factory->define(App\Group::class,function(Faker\Generator $faker){
+$factory->define(\Illuminate\Notifications\DatabaseNotification::class, function ($faker) {
     return [
-        'name' => $faker->word,
-        'member_num' => mt_rand(10,100)
+        'id' => \Ramsey\Uuid\Uuid::uuid4()->toString(),
+        'type' => 'App\Notifications\ThreadWasUpdated',
+        'notifiable_id' => function () {
+            return auth()->id() ?: factory('App\User')->create()->id;
+        },
+        'notifiable_type' => 'App\User',
+        'data' => ['foo' => 'bar']
     ];
 });

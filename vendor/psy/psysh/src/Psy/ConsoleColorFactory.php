@@ -50,9 +50,6 @@ class ConsoleColorFactory
     {
         $color = new ConsoleColor();
         $color->addTheme(Highlighter::LINE_NUMBER, array('blue'));
-        $color->addTheme(Highlighter::TOKEN_KEYWORD, array('yellow'));
-        $color->addTheme(Highlighter::TOKEN_STRING, array('green'));
-        $color->addTheme(Highlighter::TOKEN_COMMENT, array('dark_gray'));
 
         return $color;
     }

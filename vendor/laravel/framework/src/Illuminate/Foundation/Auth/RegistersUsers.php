@@ -26,15 +26,12 @@ trait RegistersUsers
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function register(Request $request , $user = null)
+    public function register(Request $request)
     {
-        if($user){
-            event(new Registered($user));
-        }else{
         $this->validator($request->all())->validate();
 
         event(new Registered($user = $this->create($request->all())));
-        }
+
         $this->guard()->login($user);
 
         return $this->registered($request, $user)

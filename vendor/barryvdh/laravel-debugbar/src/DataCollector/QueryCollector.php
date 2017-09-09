@@ -14,7 +14,6 @@ class QueryCollector extends PDOCollector
     protected $queries = [];
     protected $renderSqlWithParams = false;
     protected $findSource = false;
-    protected $middleware = [];
     protected $explainQuery = false;
     protected $explainTypes = ['SELECT']; // ['SELECT', 'INSERT', 'UPDATE', 'DELETE']; for MySQL 5.6.3+
     protected $showHints = false;
@@ -53,12 +52,10 @@ class QueryCollector extends PDOCollector
      * Enable/disable finding the source
      *
      * @param bool $value
-     * @param array $middleware
      */
-    public function setFindSource($value, array $middleware)
+    public function setFindSource($value = true)
     {
         $this->findSource = (bool) $value;
-        $this->middleware = $middleware;
     }
 
     /**
@@ -100,7 +97,7 @@ class QueryCollector extends PDOCollector
             $explainResults = $statement->fetchAll(\PDO::FETCH_CLASS);
         }
 
-        $bindings = $this->getDataFormatter()->checkBindings($bindings);
+        $bindings = $this->checkBindings($bindings);
         if (!empty($bindings) && $this->renderSqlWithParams) {
             foreach ($bindings as $key => $binding) {
                 // This regex matches placeholders only, not the question marks,
@@ -113,8 +110,7 @@ class QueryCollector extends PDOCollector
             }
         }
 
-        $source = [];
-
+        $source = null;
         if ($this->findSource) {
             try {
                 $source = $this->findSource();
@@ -124,8 +120,7 @@ class QueryCollector extends PDOCollector
 
         $this->queries[] = [
             'query' => $query,
-            'type' => 'query',
-            'bindings' => $this->getDataFormatter()->escapeBindings($bindings),
+            'bindings' => $this->escapeBindings($bindings),
             'time' => $time,
             'source' => $source,
             'explain' => $explainResults,
@@ -136,6 +131,36 @@ class QueryCollector extends PDOCollector
         if ($this->timeCollector !== null) {
             $this->timeCollector->addMeasure($query, $startTime, $endTime);
         }
+    }
+
+    /**
+     * Check bindings for illegal (non UTF-8) strings, like Binary data.
+     *
+     * @param $bindings
+     * @return mixed
+     */
+    protected function checkBindings($bindings)
+    {
+        foreach ($bindings as &$binding) {
+            if (is_string($binding) && !mb_check_encoding($binding, 'UTF-8')) {
+                $binding = '[BINARY DATA]';
+            }
+        }
+        return $bindings;
+    }
+
+    /**
+     * Make the bindings safe for outputting.
+     *
+     * @param array $bindings
+     * @return array
+     */
+    protected function escapeBindings($bindings)
+    {
+        foreach ($bindings as &$binding) {
+            $binding = htmlentities($binding, ENT_QUOTES, 'UTF-8', false);
+        }
+        return $bindings;
     }
 
     /**
@@ -175,105 +200,39 @@ class QueryCollector extends PDOCollector
             $hints[] = 	'An argument has a leading wildcard character: <code>' . $matches[1]. '</code>.
 								The predicate with this argument is not sargable and cannot use an index if one exists.';
         }
-        return $hints;
+        return implode("<br />", $hints);
     }
 
     /**
-     * Use a backtrace to search for the origins of the query.
-     *
-     * @return array
+     * Use a backtrace to search for the origin of the query.
      */
     protected function findSource()
     {
-        $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS | DEBUG_BACKTRACE_PROVIDE_OBJECT);
+        $traces = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS | DEBUG_BACKTRACE_PROVIDE_OBJECT);
+        foreach ($traces as $trace) {
+            if (isset($trace['class']) && isset($trace['file']) && strpos(
+                    $trace['file'],
+                    DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR
+                ) === false
+            ) {
+                if (isset($trace['object']) && is_a($trace['object'], 'Twig_Template')) {
+                    list($file, $line) = $this->getTwigInfo($trace);
+                } elseif (strpos($trace['file'], storage_path()) !== false) {
+                    $hash = pathinfo($trace['file'], PATHINFO_FILENAME);
+                    $line = isset($trace['line']) ? $trace['line'] : '?';
 
-        $sources = [];
-
-        foreach ($stack as $index => $trace) {
-            $sources[] = $this->parseTrace($index, $trace);
-        }
-
-        return array_filter($sources);
-    }
-
-    /**
-     * Parse a trace element from the backtrace stack.
-     *
-     * @param  int    $index
-     * @param  array  $trace
-     * @return object|bool
-     */
-    protected function parseTrace($index, array $trace)
-    {
-        $frame = (object) [
-            'index' => $index,
-            'namespace' => null,
-            'name' => null,
-            'line' => isset($trace['line']) ? $trace['line'] : '?',
-        ];
-
-        if (isset($trace['function']) && $trace['function'] == 'substituteBindings') {
-            $frame->name = 'Route binding';
-
-            return $frame;
-        }
-
-        if (isset($trace['class']) && isset($trace['file']) && strpos(
-                $trace['file'],
-                DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'laravel' . DIRECTORY_SEPARATOR . 'framework'
-            ) === false && strpos(
-                $trace['file'],
-                DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'barryvdh' . DIRECTORY_SEPARATOR . 'laravel-debugbar'
-            ) === false
-        ) {
-            $file = $trace['file'];
-
-            if (isset($trace['object']) && is_a($trace['object'], 'Twig_Template')) {
-                list($file, $frame->line) = $this->getTwigInfo($trace);
-            } elseif (strpos($file, storage_path()) !== false) {
-                $hash = pathinfo($file, PATHINFO_FILENAME);
-
-                if (! $frame->name = $this->findViewFromHash($hash)) {
-                    $frame->name = $hash;
-                }
-
-                $frame->namespace = 'view';
-
-                return $frame;
-            } elseif (strpos($file, 'Middleware') !== false) {
-                $frame->name = $this->findMiddlewareFromFile($file);
-
-                if ($frame->name) {
-                    $frame->namespace = 'middleware';
+                    if ($name = $this->findViewFromHash($hash)) {
+                        return 'view::' . $name . ':' . $line;
+                    }
+                    return 'view::' . $hash . ':' . $line;
                 } else {
-                    $frame->name = $this->normalizeFilename($file);
+                    $file = $trace['file'];
+                    $line = isset($trace['line']) ? $trace['line'] : '?';
                 }
 
-                return $frame;
-            }
-
-            $frame->name = $this->normalizeFilename($file);
-
-            return $frame;
-        }
-
-
-        return false;
-    }
-
-    /**
-     * Find the middleware alias from the file.
-     *
-     * @param  string $file
-     * @return string|null
-     */
-    protected function findMiddlewareFromFile($file)
-    {
-        $filename = pathinfo($file, PATHINFO_FILENAME);
-
-        foreach ($this->middleware as $alias => $class) {
-            if (strpos($class, $filename) !== false) {
-                return $alias;
+                return $this->normalizeFilename($file) . ':' . $line;
+            } elseif (isset($trace['function']) && $trace['function'] == 'Illuminate\Routing\{closure}') {
+                return 'Route binding';
             }
         }
     }
@@ -340,35 +299,6 @@ class QueryCollector extends PDOCollector
     }
 
     /**
-     * Collect a database transaction event.
-     * @param  string $event
-     * @param \Illuminate\Database\Connection $connection
-     * @return array
-     */
-    public function collectTransactionEvent($event, $connection)
-    {
-        $source = [];
-
-        if ($this->findSource) {
-            try {
-                $source = $this->findSource();
-            } catch (\Exception $e) {
-            }
-        }
-
-        $this->queries[] = [
-            'query' => $event,
-            'type' => 'transaction',
-            'bindings' => [],
-            'time' => 0,
-            'source' => $source,
-            'explain' => [],
-            'connection' => $connection->getDatabaseName(),
-            'hints' => null,
-        ];
-    }
-
-    /**
      * Reset the queries.
      */
     public function reset()
@@ -388,16 +318,17 @@ class QueryCollector extends PDOCollector
         foreach ($queries as $query) {
             $totalTime += $query['time'];
 
+            $bindings = $query['bindings'];
+            if($query['hints']){
+                $bindings['hints'] = $query['hints'];
+            }
+
             $statements[] = [
-                'sql' => $this->getDataFormatter()->formatSql($query['query']),
-                'type' => $query['type'],
-                'params' => [],
-                'bindings' => $query['bindings'],
-                'hints' => $query['hints'],
-                'backtrace' => array_values($query['source']),
+                'sql' => $this->formatSql($query['query']),
+                'params' => (object) $bindings,
                 'duration' => $query['time'],
-                'duration_str' => ($query['type'] == 'transaction') ? '' : $this->formatDuration($query['time']),
-                'stmt_id' => $this->getDataFormatter()->formatSource(reset($query['source'])),
+                'duration_str' => $this->formatDuration($query['time']),
+                'stmt_id' => $query['source'],
                 'connection' => $query['connection'],
             ];
 
@@ -405,7 +336,6 @@ class QueryCollector extends PDOCollector
             foreach($query['explain'] as $explain){
                 $statements[] = [
                     'sql' => ' - EXPLAIN #' . $explain->id . ': `' . $explain->table . '` (' . $explain->select_type . ')',
-                    'type' => 'explain',
                     'params' => $explain,
                     'row_count' => $explain->rows,
                     'stmt_id' => $explain->id,
@@ -413,18 +343,25 @@ class QueryCollector extends PDOCollector
             }
         }
 
-        $nb_statements = array_filter($queries, function ($query) {
-            return $query['type'] == 'query';
-        });
-
         $data = [
-            'nb_statements' => count($nb_statements),
+            'nb_statements' => count($queries),
             'nb_failed_statements' => 0,
             'accumulated_duration' => $totalTime,
             'accumulated_duration_str' => $this->formatDuration($totalTime),
             'statements' => $statements
         ];
         return $data;
+    }
+
+    /**
+     * Removes extra spaces at the beginning and end of the SQL query and its lines.
+     *
+     * @param string $sql
+     * @return string
+     */
+    protected function formatSql($sql)
+    {
+        return trim(preg_replace("/\s*\n\s*/", "\n", $sql));
     }
 
     /**
@@ -442,8 +379,8 @@ class QueryCollector extends PDOCollector
     {
         return [
             "queries" => [
-                "icon" => "database",
-                "widget" => "PhpDebugBar.Widgets.LaravelSQLQueriesWidget",
+                "icon" => "inbox",
+                "widget" => "PhpDebugBar.Widgets.SQLQueriesWidget",
                 "map" => "queries",
                 "default" => "[]"
             ],

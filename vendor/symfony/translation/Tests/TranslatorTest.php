@@ -156,7 +156,6 @@ class TranslatorTest extends TestCase
         $translator = new Translator($locale, new MessageSelector());
         $translator->setFallbackLocales(array('fr', $locale));
         // no assertion. this method just asserts that no exception is thrown
-        $this->addToAssertionCount(1);
     }
 
     public function testTransWithFallbackLocale()
@@ -188,7 +187,6 @@ class TranslatorTest extends TestCase
         $translator = new Translator('fr', new MessageSelector());
         $translator->addResource('array', array('foo' => 'foofoo'), $locale);
         // no assertion. this method just asserts that no exception is thrown
-        $this->addToAssertionCount(1);
     }
 
     public function testAddResourceAfterTrans()
@@ -392,7 +390,6 @@ class TranslatorTest extends TestCase
 
         $translator->transChoice('foo', 1, array(), '', $locale);
         // no assertion. this method just asserts that no exception is thrown
-        $this->addToAssertionCount(1);
     }
 
     public function getTransFileTests()

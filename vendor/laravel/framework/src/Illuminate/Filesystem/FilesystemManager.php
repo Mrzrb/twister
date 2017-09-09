@@ -16,9 +16,6 @@ use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\AwsS3v3\AwsS3Adapter as S3Adapter;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 
-/**
- * @mixin \Illuminate\Contracts\Filesystem\Filesystem
- */
 class FilesystemManager implements FactoryContract
 {
     /**

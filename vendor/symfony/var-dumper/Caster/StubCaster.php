@@ -35,10 +35,8 @@ class StubCaster
                 $stub->class = Stub::STRING_BINARY;
             }
 
-            $a = array();
+            return array();
         }
-
-        return $a;
     }
 
     public static function castCutArray(CutArrayStub $c, array $a, Stub $stub, $isNested)

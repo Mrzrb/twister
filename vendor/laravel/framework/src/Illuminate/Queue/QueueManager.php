@@ -7,9 +7,6 @@ use InvalidArgumentException;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
 
-/**
- * @mixin \Illuminate\Contracts\Queue\Queue
- */
 class QueueManager implements FactoryContract, MonitorContract
 {
     /**

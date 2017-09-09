@@ -31,13 +31,13 @@ class ReflectionCaster
         'isVariadic' => 'isVariadic',
     );
 
-    public static function castClosure(\Closure $c, array $a, Stub $stub, $isNested, $filter = 0)
+    public static function castClosure(\Closure $c, array $a, Stub $stub, $isNested)
     {
         $prefix = Caster::PREFIX_VIRTUAL;
         $c = new \ReflectionFunction($c);
 
         $stub->class = 'Closure'; // HHVM generates unique class names for closures
-        $a = static::castFunctionAbstract($c, $a, $stub, $isNested, $filter);
+        $a = static::castFunctionAbstract($c, $a, $stub, $isNested);
 
         if (isset($a[$prefix.'parameters'])) {
             foreach ($a[$prefix.'parameters']->value as &$v) {
@@ -52,7 +52,7 @@ class ReflectionCaster
             }
         }
 
-        if (!($filter & Caster::EXCLUDE_VERBOSE) && $f = $c->getFileName()) {
+        if ($f = $c->getFileName()) {
             $a[$prefix.'file'] = new LinkStub($f, $c->getStartLine());
             $a[$prefix.'line'] = $c->getStartLine().' to '.$c->getEndLine();
         }
@@ -199,11 +199,7 @@ class ReflectionCaster
 
         if ($v = $c->getStaticVariables()) {
             foreach ($v as $k => &$v) {
-                if (is_object($v)) {
-                    $a[$prefix.'use']['$'.$k] = new CutStub($v);
-                } else {
-                    $a[$prefix.'use']['$'.$k] = &$v;
-                }
+                $a[$prefix.'use']['$'.$k] = &$v;
             }
             unset($v);
             $a[$prefix.'use'] = new EnumStub($a[$prefix.'use']);

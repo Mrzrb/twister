@@ -17,15 +17,12 @@ class CreateUsersTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('password')->index();
+            $table->string('password');
+            $table->string('avatar_path')->nullable();
+            $table->boolean('confirmed')->default(false);
+            $table->string('confirmation_token', 25)->nullable();
             $table->rememberToken();
             $table->timestamps();
-        });
-
-
-        Schema::create('follow', function (Blueprint $table) {
-            $table->unsignedInteger('follower_id');
-            $table->unsignedInteger('followee_id');
         });
     }
 
@@ -37,6 +34,5 @@ class CreateUsersTable extends Migration
     public function down()
     {
         Schema::dropIfExists('users');
-        Schema::dropIfExists('follow');
     }
 }

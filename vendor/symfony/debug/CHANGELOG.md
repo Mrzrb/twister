@@ -1,11 +1,6 @@
 CHANGELOG
 =========
 
-3.3.0
------
-
-* deprecated the `ContextErrorException` class: use \ErrorException directly now
-
 3.2.0
 -----
 

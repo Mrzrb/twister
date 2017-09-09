@@ -8,9 +8,6 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
-/**
- * @mixin \Illuminate\Database\Connection
- */
 class DatabaseManager implements ConnectionResolverInterface
 {
     /**

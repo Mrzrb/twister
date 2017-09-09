@@ -22,7 +22,7 @@ class VariableEnumerator extends Enumerator
 {
     // n.b. this array is the order in which special variables will be listed
     private static $specialNames = array(
-        '_', '_e', '__out', '__function', '__method', '__class', '__namespace', '__file', '__line', '__dir',
+        '_', '_e', '__function', '__method', '__class', '__namespace', '__file', '__line', '__dir',
     );
 
     private $context;
@@ -78,13 +78,10 @@ class VariableEnumerator extends Enumerator
      */
     protected function getVariables($showAll)
     {
-        // self:: doesn't work inside closures in PHP 5.3 :-/
-        $specialNames = self::$specialNames;
-
         $scopeVars = $this->context->getAll();
-        uksort($scopeVars, function ($a, $b) use ($specialNames) {
-            $aIndex = array_search($a, $specialNames);
-            $bIndex = array_search($b, $specialNames);
+        uksort($scopeVars, function ($a, $b) {
+            $aIndex = array_search($a, self::$specialNames);
+            $bIndex = array_search($b, self::$specialNames);
 
             if ($aIndex !== false) {
                 if ($bIndex !== false) {
@@ -98,7 +95,8 @@ class VariableEnumerator extends Enumerator
                 return -1;
             }
 
-            return strnatcasecmp($a, $b);
+            // TODO: this should be natcasesort
+            return strcasecmp($a, $b);
         });
 
         $ret = array();
@@ -130,7 +128,7 @@ class VariableEnumerator extends Enumerator
                 $ret[$fname] = array(
                     'name'  => $fname,
                     'style' => in_array($name, self::$specialNames) ? self::IS_PRIVATE : self::IS_PUBLIC,
-                    'value' => $this->presentRef($val),
+                    'value' => $this->presentRef($val), // TODO: add types to variable signatures
                 );
             }
         }

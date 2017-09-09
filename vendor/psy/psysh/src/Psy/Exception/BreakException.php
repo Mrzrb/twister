@@ -36,16 +36,4 @@ class BreakException extends \Exception implements Exception
     {
         return $this->rawMessage;
     }
-
-    /**
-     * Throws BreakException.
-     *
-     * Since `throw` can not be inserted into arbitrary expressions, it wraps with function call.
-     *
-     * @throws BreakException
-     */
-    public static function exitShell()
-    {
-        throw new self('Goodbye');
-    }
 }

@@ -128,7 +128,7 @@ trait InteractsWithAuthentication
     }
 
     /**
-     * Return true if the credentials are valid, false otherwise.
+     * Return true is the credentials are valid, false otherwise.
      *
      * @param  array  $credentials
      * @param  string|null  $guard

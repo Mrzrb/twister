@@ -113,12 +113,6 @@ final class StandardTagFactory implements TagFactory
 
         list($tagName, $tagBody) = $this->extractTagParts($tagLine);
 
-        if ($tagBody !== '' && $tagBody[0] === '[') {
-            throw new \InvalidArgumentException(
-                'The tag "' . $tagLine . '" does not seem to be wellformed, please check it for errors'
-            );
-        }
-
         return $this->createTag($tagBody, $tagName, $context);
     }
 
@@ -167,7 +161,7 @@ final class StandardTagFactory implements TagFactory
     private function extractTagParts($tagLine)
     {
         $matches = array();
-        if (! preg_match('/^@(' . self::REGEX_TAGNAME . ')(?:\s*([^\s].*)|$)/us', $tagLine, $matches)) {
+        if (! preg_match('/^@(' . self::REGEX_TAGNAME . ')(?:\s*([^\s].*)|$)?/us', $tagLine, $matches)) {
             throw new \InvalidArgumentException(
                 'The tag "' . $tagLine . '" does not seem to be wellformed, please check it for errors'
             );

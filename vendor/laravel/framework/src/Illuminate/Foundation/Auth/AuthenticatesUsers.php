@@ -59,8 +59,7 @@ trait AuthenticatesUsers
     protected function validateLogin(Request $request)
     {
         $this->validate($request, [
-            $this->username() => 'required|string',
-            'password' => 'required|string',
+            $this->username() => 'required', 'password' => 'required',
         ]);
     }
 
@@ -155,7 +154,9 @@ trait AuthenticatesUsers
     {
         $this->guard()->logout();
 
-        $request->session()->invalidate();
+        $request->session()->flush();
+
+        $request->session()->regenerate();
 
         return redirect('/');
     }

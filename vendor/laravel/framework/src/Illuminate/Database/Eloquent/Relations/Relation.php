@@ -10,9 +10,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
-/**
- * @mixin \Illuminate\Database\Eloquent\Builder
- */
 abstract class Relation
 {
     use Macroable {
@@ -325,19 +322,6 @@ abstract class Relation
         return array_combine(array_map(function ($model) {
             return (new $model)->getTable();
         }, $models), $models);
-    }
-
-    /**
-     * Get the model associated with a custom polymorphic type.
-     *
-     * @param  string  $alias
-     * @return string|null
-     */
-    public static function getMorphedModel($alias)
-    {
-        return array_key_exists($alias, self::$morphMap)
-            ? self::$morphMap[$alias]
-            : null;
     }
 
     /**

@@ -605,17 +605,6 @@ class Route
     }
 
     /**
-     * Determine whether the route's name matches the given name.
-     *
-     * @param  string  $name
-     * @return bool
-     */
-    public function named($name)
-    {
-        return $this->getName() === $name;
-    }
-
-    /**
      * Set the handler for the route.
      *
      * @param  \Closure|string  $action

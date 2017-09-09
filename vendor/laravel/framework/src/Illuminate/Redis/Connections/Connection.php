@@ -4,9 +4,6 @@ namespace Illuminate\Redis\Connections;
 
 use Closure;
 
-/**
- * @mixin \Predis\Client
- */
 abstract class Connection
 {
     /**

@@ -38,7 +38,7 @@ class CommandBuilder
     }
 
     /**
-     * Build the command for running the event in the background.
+     * Build the command for running the event in the foreground.
      *
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return string

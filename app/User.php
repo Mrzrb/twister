@@ -2,21 +2,24 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     use Notifiable;
 
-    protected $guarded = [];
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name',
+        'email',
+        'password',
+        'avatar_path'
     ];
 
     /**
@@ -25,43 +28,102 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
+        'email',
     ];
 
-    /** relation of user and twist */
-    public function twist(){
-        return $this->hasMany(\App\Twist::class);
-    }
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'confirmed' => 'boolean'
+    ];
 
-    /** relation of user and group  */
-    public function groups(){
-        return $this->belongsToMany(\App\Group::class);
-    }
-
-    /** relation of user and user (follower and followee)  */
-    public function follow(){
-        return $this->belongsToMany(\App\User::class,'follow','follower_id','followee_id');
-    }
-    
-    /** relation of user and user (follower and followee)  */
-    public function followed(){
-        return $this->belongsToMany(\App\User::class,'follow','followee_id','follower_id');
-    }
-
-
-    public function activity(){
-        return $this->hasMany(\App\Activity::class);
-    }
-
-
-
-
-
-    public function path()
+    /**
+     * Get the route key name for Laravel.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
     {
-        return '/user/' . $this->id; 
+        return 'name';
+    }
+
+    /**
+     * Fetch all threads that were created by the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function threads()
+    {
+        return $this->hasMany(Thread::class)->latest();
+    }
+
+    /**
+     * Fetch the last published reply for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function lastReply()
+    {
+        return $this->hasOne(Reply::class)->latest();
+    }
+
+    /**
+     * Get all activity for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function activity()
+    {
+        return $this->hasMany(Activity::class);
+    }
+
+    /**
+     * Mark the user's account as confirmed.
+     */
+    public function confirm()
+    {
+        $this->confirmed = true;
+
+        $this->save();
+    }
+
+    /**
+     * Record that the user has read the given thread.
+     *
+     * @param Thread $thread
+     */
+    public function read($thread)
+    {
+        cache()->forever(
+            $this->visitedThreadCacheKey($thread),
+            Carbon::now()
+        );
+    }
+
+    /**
+     * Get the path to the user's avatar.
+     *
+     * @param  string $avatar
+     * @return string
+     */
+    public function getAvatarPathAttribute($avatar)
+    {
+        return asset($avatar ?: 'images/avatars/default.png');
+    }
+
+    /**
+     * Get the cache key for when a user reads a thread.
+     *
+     * @param  Thread $thread
+     * @return string
+     */
+    public function visitedThreadCacheKey($thread)
+    {
+        return sprintf("users.%s.visits.%s", $this->id, $thread->id);
     }
 }
-
-
-

@@ -35,10 +35,4 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
-
-    'github' => [
-        'client_id' => '740da751a2f82925080b',
-        'client_secret' => '8bbf003150618dc5506097465c480562a11b306c',
-        'redirect' => 'http://twist.top/github/callback',
-    ],
 ];

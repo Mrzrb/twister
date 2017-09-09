@@ -19,7 +19,7 @@ namespace Psy;
  */
 class Context
 {
-    private static $specialNames = array('_', '_e', '__out', '__psysh__', 'this');
+    private static $specialNames = array('_', '_e', '__psysh__', 'this');
 
     // Whitelist a very limited number of command-scope magic variable names.
     // This might be a bad idea, but future me can sort it out.
@@ -29,9 +29,8 @@ class Context
 
     private $scopeVariables = array();
     private $commandScopeVariables = array();
-    private $returnValue;
     private $lastException;
-    private $lastStdout;
+    private $returnValue;
     private $boundObject;
 
     /**
@@ -52,12 +51,6 @@ class Context
             case '_e':
                 if (isset($this->lastException)) {
                     return $this->lastException;
-                }
-                break;
-
-            case '__out':
-                if (isset($this->lastStdout)) {
-                    return $this->lastStdout;
                 }
                 break;
 
@@ -100,7 +93,7 @@ class Context
     }
 
     /**
-     * Get all defined magic variables: $_, $_e, $__out, $__class, $__file, etc.
+     * Get all defined magic variables: $_, $_e, $__class, $__file, etc.
      *
      * @return array
      */
@@ -114,10 +107,6 @@ class Context
             $vars['_e'] = $this->lastException;
         }
 
-        if (isset($this->lastStdout)) {
-            $vars['__out'] = $this->lastStdout;
-        }
-
         if (isset($this->boundObject)) {
             $vars['this'] = $this->boundObject;
         }
@@ -128,8 +117,7 @@ class Context
     /**
      * Set all scope variables.
      *
-     * This method does *not* set any of the magic variables: $_, $_e, $__out,
-     * $__class, $__file, etc.
+     * This method does *not* set any of the magic variables: $_, $_e, $__class, $__file, etc.
      *
      * @param array $vars
      */
@@ -190,32 +178,6 @@ class Context
         }
 
         return $this->lastException;
-    }
-
-    /**
-     * Set the most recent output from evaluated code.
-     *
-     * @param string $lastStdout
-     */
-    public function setLastStdout($lastStdout)
-    {
-        $this->lastStdout = $lastStdout;
-    }
-
-    /**
-     * Get the most recent output from evaluated code.
-     *
-     * @throws InvalidArgumentException If no output has happened yet
-     *
-     * @return null|string
-     */
-    public function getLastStdout()
-    {
-        if (!isset($this->lastStdout)) {
-            throw new \InvalidArgumentException('No most-recent output');
-        }
-
-        return $this->lastStdout;
     }
 
     /**

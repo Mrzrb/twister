@@ -132,14 +132,8 @@ class RedirectResponse extends BaseRedirectResponse
     {
         $value = $this->parseErrors($provider);
 
-        $errors = $this->session->get('errors', new ViewErrorBag);
-
-        if (! $errors instanceof ViewErrorBag) {
-            $errors = new ViewErrorBag;
-        }
-
         $this->session->flash(
-            'errors', $errors->put($key, $value)
+            'errors', $this->session->get('errors', new ViewErrorBag)->put($key, $value)
         );
 
         return $this;

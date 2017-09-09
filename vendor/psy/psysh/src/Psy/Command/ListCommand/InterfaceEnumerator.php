@@ -25,7 +25,7 @@ class InterfaceEnumerator extends Enumerator
     {
         // only list interfaces when no Reflector is present.
         //
-        // @todo make a NamespaceReflector and pass that in for commands like:
+        // TODO: make a NamespaceReflector and pass that in for commands like:
         //
         //     ls --interfaces Foo
         //

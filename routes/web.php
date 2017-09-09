@@ -12,45 +12,40 @@
 */
 
 Route::get('/', function () {
+    // \Mail::to(App\User::first())->send(new \App\Mail\PleaseConfirmYourEmail());
     return view('welcome');
 });
-
-Auth::routes();
-// Route::get('login',function(){
-//     return view('home.login');
-// });
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
 
-Route::get('/twist','TwistController@index')->name('home');
-Route::get('/twist/create','TwistController@create');
-Route::post('/twist','TwistController@store');
-Route::get('/twist/{twist}','TwistController@show');
+Route::get('threads', 'ThreadsController@index')->name('threads');
+Route::get('threads/create', 'ThreadsController@create');
+Route::get('threads/{channel}/{thread}', 'ThreadsController@show');
+Route::delete('threads/{channel}/{thread}', 'ThreadsController@destroy');
+Route::post('threads', 'ThreadsController@store')->middleware('must-be-confirmed');
+Route::get('threads/{channel}', 'ThreadsController@index');
+Route::get('/threads/{channel}/{thread}/replies', 'RepliesController@index');
+Route::post('/threads/{channel}/{thread}/replies', 'RepliesController@store');
+Route::patch('/replies/{reply}', 'RepliesController@update');
+Route::delete('/replies/{reply}', 'RepliesController@destroy');
 
-//reply
-Route::post('/twist/{twist}/reply','TwistController@reply');
+Route::post('/threads/{channel}/{thread}/subscriptions', 'ThreadSubscriptionsController@store')->middleware('auth');
+Route::delete('/threads/{channel}/{thread}/subscriptions', 'ThreadSubscriptionsController@destroy')->middleware('auth');
 
+Route::post('/replies/{reply}/favorites', 'FavoritesController@store');
+Route::delete('/replies/{reply}/favorites', 'FavoritesController@destroy');
 
+Route::get('/profiles/{user}', 'ProfilesController@show')->name('profile');
+Route::get('/profiles/{user}/notifications', 'UserNotificationsController@index');
+Route::delete('/profiles/{user}/notifications/{notification}', 'UserNotificationsController@destroy');
 
-//github sociate
-Route::any('/github','OAuthController@redirectToProvider');
-Route::any('/github/callback','OAuthController@handleProviderCallback');
+Route::get('/register/confirm', 'Auth\RegisterConfirmationController@index')->name('register.confirm');
 
+Route::get('api/users', 'Api\UsersController@index');
+Route::post('api/users/{user}/avatar', 'Api\UserAvatarController@store')->middleware('auth')->name('avatar');
 
-//User Follow
-Route::get('/follow/{user}','UserController@followOrNot');
-Route::get('user/{group}/join','UserController@joinOrNot');
-//User Profile
-Route::get('/user/{profileUser}','ProfileController@show');
+Auth::routes();
 
-
-
-//group
-
-// Route::get('/group','GroupController@index');
-Route::get('/group/create','GroupController@create');
-Route::post('/group','GroupController@store');
-
-Route::get('/group/{group}','GroupController@show');
+Route::get('/home', 'HomeController@index');

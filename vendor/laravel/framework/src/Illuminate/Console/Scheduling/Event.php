@@ -10,10 +10,18 @@ use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Cache\Repository as Cache;
 
 class Event
 {
     use Macroable, ManagesFrequencies;
+
+    /**
+     * The cache store implementation.
+     *
+     * @var \Illuminate\Contracts\Cache\Repository
+     */
+    protected $cache;
 
     /**
      * The command string.
@@ -63,13 +71,6 @@ class Event
      * @var bool
      */
     public $withoutOverlapping = false;
-
-    /**
-     * The amount of time the mutex should be valid.
-     *
-     * @var int
-     */
-    public $expiresAt = 1440;
 
     /**
      * Indicates if the command should run in background.
@@ -128,22 +129,15 @@ class Event
     public $description;
 
     /**
-     * The mutex implementation.
-     *
-     * @var \Illuminate\Console\Scheduling\Mutex
-     */
-    public $mutex;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
+     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @param  string  $command
      * @return void
      */
-    public function __construct(Mutex $mutex, $command)
+    public function __construct(Cache $cache, $command)
     {
-        $this->mutex = $mutex;
+        $this->cache = $cache;
         $this->command = $command;
         $this->output = $this->getDefaultOutput();
     }
@@ -166,9 +160,8 @@ class Event
      */
     public function run(Container $container)
     {
-        if ($this->withoutOverlapping &&
-            ! $this->mutex->create($this)) {
-            return;
+        if ($this->withoutOverlapping) {
+            $this->cache->put($this->mutexName(), true, 1440);
         }
 
         $this->runInBackground
@@ -370,7 +363,7 @@ class Event
     {
         $this->ensureOutputIsBeingCapturedForEmail();
 
-        $addresses = is_array($addresses) ? $addresses : [$addresses];
+        $addresses = is_array($addresses) ? $addresses : func_get_args();
 
         return $this->then(function (Mailer $mailer) use ($addresses, $onlyIfOutputExists) {
             $this->emailOutput($mailer, $addresses, $onlyIfOutputExists);
@@ -412,7 +405,7 @@ class Event
      */
     protected function emailOutput(Mailer $mailer, $addresses, $onlyIfOutputExists = false)
     {
-        $text = file_exists($this->output) ? file_get_contents($this->output) : '';
+        $text = file_get_contents($this->output);
 
         if ($onlyIfOutputExists && empty($text)) {
             return;
@@ -516,19 +509,16 @@ class Event
     /**
      * Do not allow the event to overlap each other.
      *
-     * @param  int  $expiresAt
      * @return $this
      */
-    public function withoutOverlapping($expiresAt = 1440)
+    public function withoutOverlapping()
     {
         $this->withoutOverlapping = true;
 
-        $this->expiresAt = $expiresAt;
-
         return $this->then(function () {
-            $this->mutex->forget($this);
+            $this->cache->forget($this->mutexName());
         })->skip(function () {
-            return $this->mutex->exists($this);
+            return $this->cache->has($this->mutexName());
         });
     }
 
@@ -634,21 +624,6 @@ class Event
     }
 
     /**
-     * Determine the next due date for an event.
-     *
-     * @param  \DateTime|string  $currentTime
-     * @param  int  $nth
-     * @param  bool  $allowCurrentDate
-     * @return \Carbon\Carbon
-     */
-    public function nextRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
-    {
-        return Carbon::instance($nextDue = CronExpression::factory(
-            $this->getExpression()
-        )->getNextRunDate($currentTime, $nth, $allowCurrentDate));
-    }
-
-    /**
      * Get the Cron expression for the event.
      *
      * @return string
@@ -656,18 +631,5 @@ class Event
     public function getExpression()
     {
         return $this->expression;
-    }
-
-    /**
-     * Set the mutex implementation to be used.
-     *
-     * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
-     * @return $this
-     */
-    public function preventOverlapsUsing(Mutex $mutex)
-    {
-        $this->mutex = $mutex;
-
-        return $this;
     }
 }

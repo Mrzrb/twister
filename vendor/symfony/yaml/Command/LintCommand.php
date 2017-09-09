@@ -18,7 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Validates YAML files syntax and outputs encountered errors.
@@ -103,20 +102,10 @@ EOF
 
     private function validate($content, $file = null)
     {
-        $prevErrorHandler = set_error_handler(function ($level, $message, $file, $line) use (&$prevErrorHandler) {
-            if (E_USER_DEPRECATED === $level) {
-                throw new ParseException($message);
-            }
-
-            return $prevErrorHandler ? $prevErrorHandler($level, $message, $file, $line) : false;
-        });
-
         try {
-            $this->getParser()->parse($content, Yaml::PARSE_CONSTANT);
+            $this->getParser()->parse($content);
         } catch (ParseException $e) {
             return array('file' => $file, 'valid' => false, 'message' => $e->getMessage());
-        } finally {
-            restore_error_handler();
         }
 
         return array('file' => $file, 'valid' => true);

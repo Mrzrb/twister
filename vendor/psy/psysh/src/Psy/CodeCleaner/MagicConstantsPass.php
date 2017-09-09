@@ -16,7 +16,7 @@ use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\MagicConst\Dir;
 use PhpParser\Node\Scalar\MagicConst\File;
-use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Scalar\String_ as StringNode;
 
 /**
  * Swap out __DIR__ and __FILE__ magic constants with our best guess?
@@ -29,14 +29,14 @@ class MagicConstantsPass extends CodeCleanerPass
      *
      * @param Node $node
      *
-     * @return null|FuncCall|String_
+     * @return null|FuncCall|StringNode
      */
     public function enterNode(Node $node)
     {
         if ($node instanceof Dir) {
             return new FuncCall(new Name('getcwd'), array(), $node->getAttributes());
         } elseif ($node instanceof File) {
-            return new String_('', $node->getAttributes());
+            return new StringNode('', $node->getAttributes());
         }
     }
 }
